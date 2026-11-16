@@ -8,8 +8,8 @@ evidencemap.egg-info/
 # Big/derived files are tracked by DVC, not Git.
 /data/raw/*
 /data/processed/*
-!/data/raw/.gitkeep
-!/data/processed/.gitkeep
 mlruns/
+mlartifacts/
+mlflow.db
 *.faiss
 *.pt
