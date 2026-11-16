@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+evidencemap.egg-info/
+# Big/derived files are tracked by DVC, not Git.
+/data/raw/*
+/data/processed/*
+!/data/raw/.gitkeep
+!/data/processed/.gitkeep
+mlruns/
+*.faiss
+*.pt

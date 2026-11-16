@@ -1,0 +1,46 @@
+# Single source of truth for scope decisions (Step 1). Code reads this file; nothing is hard-coded.
+project:
+  name: EvidenceMap
+  processing_version: v1
+
+scope:
+  domains: ["machine learning", "computer vision"]
+  year_from: 2018
+  corpus_size_target: 1000        # papers for the MVP
+  content_level: abstracts        # abstracts -> open_access_fulltext later
+  interface_language: en
+
+  # One entry per domain; each query is run separately and results are tagged with the domain.
+  queries:
+    machine learning:
+      - "deep learning neural network training"
+      - "transformer language model"
+      - "self-supervised representation learning"
+      - "transfer learning fine-tuning"
+      - "reinforcement learning"
+      - "graph neural network"
+      - "generalization regularization machine learning"
+    computer vision:
+      - "image classification convolutional network"
+      - "object detection"
+      - "semantic segmentation"
+      - "vision transformer"
+      - "visual object tracking"
+      - "3D vision depth estimation"
+      - "vision-language model"
+      - "image generation diffusion model"
+
+sources:
+  openalex:
+    base_url: https://api.openalex.org
+    # Work types: ML papers are mostly arXiv preprints, so "article" alone would miss most of them.
+    work_types: ["article", "preprint"]
+    per_page: 200
+    # API key goes in .env (OPENALEX_API_KEY), never here.
+
+models:
+  embedding: sentence-transformers/all-MiniLM-L6-v2   # small, CPU friendly
+  # Candidates to compare at Step 4: BAAI/bge-small-en-v1.5, allenai/specter2_base
+
+compute:
+  training_env: colab_or_kaggle   # no local GPU
