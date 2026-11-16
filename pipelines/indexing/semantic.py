@@ -110,8 +110,8 @@ class SemanticIndex:
     def warmup(self) -> float:
         if not self._papers:
             return 0.0
-        self._ensure_encoder()
         started = time.perf_counter()
+        self._ensure_encoder()
         self._encoder.encode(
             ["EvidenceMap semantic search warm-up"],
             normalize_embeddings=True,
