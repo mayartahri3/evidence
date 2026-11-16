@@ -1,5 +1,5 @@
 install:
-	pip install -e ".[dev]"
+	pip install -e ".[dev,semantic,mlops]"
 test:
 	pytest -q
 run:

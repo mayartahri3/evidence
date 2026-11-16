@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 evidencemap.egg-info/
+.cache/
 # Big/derived files are tracked by DVC, not Git.
 /data/raw/*
 /data/processed/*

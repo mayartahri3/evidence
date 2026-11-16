@@ -1,9 +1,14 @@
 import httpx
+import pytest
 
-from pipelines.indexing import CorpusIndex
+from pipelines.indexing import CorpusIndex, SemanticIndex
 from pipelines.ingestion.dedup import deduplicate, normalize_title
 from pipelines.ingestion.openalex import (
-    OpenAlexClient, normalize_doi, reconstruct_abstract, work_to_paper)
+    OpenAlexClient,
+    normalize_doi,
+    reconstruct_abstract,
+    work_to_paper,
+)
 from pipelines.ingestion.schema import Paper
 
 
@@ -46,7 +51,7 @@ def test_work_to_paper_mapping_and_missing_title():
 def test_dedup_same_doi_merges_and_unions_domains():
     a = P("1", doi="10.1/x", domains=["machine learning"])
     b = P("2", doi="10.1/x", abstract="has abstract", domains=["computer vision"])
-    unique, log, possible = deduplicate([a, b])
+    unique, _log, possible = deduplicate([a, b])
     assert len(unique) == 1 and not possible
     assert unique[0].abstract == "has abstract"
     assert unique[0].domains == ["computer vision", "machine learning"]
@@ -134,3 +139,48 @@ def test_corpus_index_ranks_title_matches_and_applies_domain_filter():
 
     filtered = index.search("vision", limit=5, domain="computer vision")
     assert {item["paper_id"] for item in filtered} == {"p1", "p3"}
+
+
+def test_semantic_index_ranks_embeddings_filters_domain_and_reuses_cache(tmp_path):
+    np = pytest.importorskip("numpy")
+
+    class FakeEncoder:
+        def __init__(self):
+            self.calls = 0
+
+        def encode(self, sentences, **kwargs):
+            self.calls += 1
+            vectors = {
+                "graph neural network recommendation": [1.0, 0.0],
+                "Graph recommendation models. A graph-based method.": [0.9, 0.1],
+                "Vision language models. Image-text alignment.": [0.0, 1.0],
+            }
+            return np.asarray([vectors[text] for text in sentences], dtype=np.float32)
+
+    papers = [
+        {
+            "paper_id": "p1",
+            "title": "Graph recommendation models",
+            "abstract": "A graph-based method.",
+            "domains": ["machine learning"],
+        },
+        {
+            "paper_id": "p2",
+            "title": "Vision language models",
+            "abstract": "Image-text alignment.",
+            "domains": ["computer vision"],
+        },
+    ]
+    encoder = FakeEncoder()
+    index = SemanticIndex(papers, "test-model", encoder=encoder, cache_dir=tmp_path)
+    results = index.search(
+        "graph neural network recommendation", limit=2, domain="MACHINE LEARNING"
+    )
+
+    assert [item["paper_id"] for item in results] == ["p1"]
+    assert results[0]["score"] > 0.9
+
+    cached = SemanticIndex(papers, "test-model", encoder=encoder, cache_dir=tmp_path)
+    assert encoder.calls == 2
+    assert cached.search("graph neural network recommendation")[0]["paper_id"] == "p1"
+    assert encoder.calls == 3
