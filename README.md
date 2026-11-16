@@ -24,12 +24,13 @@ Semantic retrieval uses the pretrained MiniLM transformer configured in `configs
 curl "http://127.0.0.1:8000/search?q=graph%20neural%20network%20recommendation&domain=machine%20learning&mode=semantic&limit=5"
 ```
 
-Compare lexical retrieval with neural semantic retrieval and log both to MLflow:
+Run the labeled retrieval benchmark. It computes Recall@K and MRR@K for lexical and semantic search, logs the metrics to MLflow, and records nested retrieval/evaluation traces:
 ```powershell
-python -m pipelines.evaluation.track_search --top-k 5
+python -m pipelines.evaluation.evaluate_retrieval --top-k 5
 python -m mlflow ui --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000
 ```
-The current MLflow runs record runtime and retrieved results. Retrieval-quality metrics require human-judged relevant-paper labels; the OpenAlex search queries are not treated as ground truth.
+The starter judgments are in `data/evaluation/relevance.json`. They were selected from paper titles/abstracts and need independent human review before treating the metrics as ground truth. The latest trace IDs are saved locally under `.cache/evidencemap/`.
+Search timings exclude one-time model warm-up; that startup duration is logged separately.
 
 ## Data and search experiment tracking
 Install the MLOps tools:
@@ -51,4 +52,4 @@ Run one MLflow experiment per configured query, then view results at `http://127
 python -m pipelines.evaluation.track_search --top-k 5
 python -m mlflow ui --backend-store-uri sqlite:///mlflow.db --host 127.0.0.1 --port 5000
 ```
-These runs record retrieval latency, result counts, and top results; relevance metrics need a human-labeled query set.
+These runs record retrieval latency, result counts, and top results for every configured query.

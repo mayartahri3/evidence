@@ -101,14 +101,29 @@ class SemanticIndex:
             digest.update(b"\0")
         return digest.hexdigest()
 
-    def search(self, query: str, limit: int = 10, domain: str | None = None) -> list[dict]:
-        if not query.strip() or limit <= 0 or not self._papers:
-            return []
-
+    def _ensure_encoder(self) -> None:
         if self._encoder is None:
             from sentence_transformers import SentenceTransformer
 
             self._encoder = SentenceTransformer(self.model_name)
+
+    def warmup(self) -> float:
+        if not self._papers:
+            return 0.0
+        self._ensure_encoder()
+        started = time.perf_counter()
+        self._encoder.encode(
+            ["EvidenceMap semantic search warm-up"],
+            normalize_embeddings=True,
+            show_progress_bar=False,
+        )
+        return time.perf_counter() - started
+
+    def search(self, query: str, limit: int = 10, domain: str | None = None) -> list[dict]:
+        if not query.strip() or limit <= 0 or not self._papers:
+            return []
+
+        self._ensure_encoder()
         query_embedding = self._np.asarray(
             self._encoder.encode(
                 [query],

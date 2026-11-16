@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "labeling_notes": "Starter relevance judgments based on paper titles and abstracts. Review these labels before treating scores as an independently human-validated benchmark.",
+  "queries": [
+    {
+      "query": "graph neural networks in recommender systems",
+      "domain": "machine learning",
+      "relevant_paper_ids": [
+        "oa_W4315977496",
+        "oa_W3097300053",
+        "oa_W3042856524"
+      ]
+    },
+    {
+      "query": "object tracking in video",
+      "domain": "computer vision",
+      "relevant_paper_ids": [
+        "oa_W4321460325",
+        "oa_W4306659371",
+        "oa_W2997150930",
+        "oa_W3162500488",
+        "oa_W2902061456"
+      ]
+    },
+    {
+      "query": "vision language models",
+      "domain": "computer vision",
+      "relevant_paper_ids": [
+        "oa_W7220695481",
+        "oa_W4399114997",
+        "oa_W4385970122",
+        "oa_W4392172801",
+        "oa_W4402698743"
+      ]
+    },
+    {
+      "query": "image semantic segmentation",
+      "domain": "computer vision",
+      "relevant_paper_ids": [
+        "oa_W3159637683",
+        "oa_W2996102538",
+        "oa_W3153332184",
+        "oa_W3180659539",
+        "oa_W3000896980"
+      ]
+    },
+    {
+      "query": "deep reinforcement learning",
+      "domain": "machine learning",
+      "relevant_paper_ids": [
+        "oa_W3100366369",
+        "oa_W3093426589",
+        "oa_W4297964528",
+        "oa_W2893662673"
+      ]
+    }
+  ]
+}
